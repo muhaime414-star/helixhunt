@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Biology Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- GLOBAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: url('./web_assets/background_imagee.png') no-repeat center center/cover;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #e8f5e9; /* Fallback color */
+        }
+
+        /* --- LAYOUT --- */
+        .main-container {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 67, 33, 0.05); 
+            display: flex;
+            flex-direction: column;
+            padding: 20px 50px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+               .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            /* 1. Force it to be huge to combat the empty transparent space */
+            height: 140px; 
+            width: auto;
+            /* 2. Negative margins pull it tight so it doesn't stretch your header */
+            margin: -40px 0 -40px -15px; 
+            
+            opacity: 0;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.05));
+            
+            /* 3. Slower, much more obvious entrance animation */
+            animation: logoFadeIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* 4. A much stronger hover effect so you can clearly see it */
+        .logo-container:hover .brand-logo {
+            transform: scale(1.12) translateY(-5px) rotate(-2deg);
+            filter: drop-shadow(0 12px 20px rgba(26, 67, 33, 0.3));
+        }
+
+        /* 5. A wider, bouncier entrance keyframe */
+        @keyframes logoFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+
+        /* HEADER GROUPING FOR GREETING & AVATAR */
+        .header-user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-greeting {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a4321;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #greeting-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        #greeting-text::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #1a4321;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .user-greeting:hover #greeting-text::after {
+            width: 100%;
+        }
+
+        /* NEW AVATAR BUTTON IN HEADER */
+     
+
+        .user-avatar-btn {
+        width: 60px; /* Slightly larger for better visibility */
+        height: 60px;
+        border-radius: 50%;
+        background: #ffffff;
+        /* Use a gradient that matches your theme's greens */
+        border: 2px solid transparent;
+        background-image: linear-gradient(white, white), 
+                        linear-gradient(135deg, #2ecc71, #1a4321);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
+        
+        /* Softer, more modern shadow */
+        box-shadow: 0 8px 20px rgba(26, 67, 33, 0.15);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: visible; /* To allow a status badge to peek out */
+        position: relative;
+        transition: all 0.3s ease;
+    }
+        .user-avatar-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+       
+        .user-avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* This fills the circle completely */
+            border-radius: 50%; /* Ensures the image itself is rounded */
+            transform: scale(0.9); /* Keeps a tiny margin from the border for a "framed" look */
+        }
+
+        /* --- CARDS CONTAINER --- */
+        .dashboard-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+        }
+
+        /* --- BIG GLASS CARDS --- */
+        .menu-card {
+            width: 400px;
+            height: 500px;
+            border-radius: 40px;
+            padding: 40px 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(200, 245, 255, 0.5) 0%, rgba(180, 230, 255, 0.3) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+        /* --- PODIUM BADGE CSS --- */
+        .dash-avatar-ring {
+            position: relative; /* This is required so the absolute badge stays attached to the ring */
+        }
+
+        .podium-badge {
+            position: absolute;
+            top: -10px;   
+            right: -10px;  
+            width: 32px;
+            height: 32px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .podium-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- LIST BADGE CSS --- */
+        .dash-row-name {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Adds space between the name and the badge */
+        }
+
+        .row-badge {
+            width: 32px;           /* Increased to match podium badges */
+            height: 32px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            object-fit: cover;   
+            padding: 0;            /* Removed padding so the graphic fills the circle */
+        }
+
+        .menu-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            border-color: #fff;
+        }
+
+        /* --- FLOATING ICON ANIMATION --- */
+        .icon-area {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-placeholder {
+            font-size: 100px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        /* --- TEXT STYLING --- */
+        h2 {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1a4321;
+            margin-top: 10px;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #444;
+            font-weight: 500;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        /* --- UPDATED ACTION BUTTONS WITH PULSE & SHINE --- */
+        .action-btn {
+            width: 80%;
+            padding: 18px 0;
+            border-radius: 50px;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(90deg, #e67e22 0%, #f39c12 100%);
+            box-shadow: 0 10px 20px rgba(230, 126, 34, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.6s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px) scale(1.06);
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        /* --- LEADERBOARD MOBILE RESPONSIVE FIX --- */
+@media (max-width: 900px) {
+    /* 1. Maximize modal space on mobile */
+    .dash-modal-box {
+        width: 95%;
+        height: 90vh;
+        transform: translateY(10px) scale(0.98); /* Slight adjustment for entrance animation */
+    }
+    
+    /* 2. Stack the podium and list vertically */
+    .dash-content {
+        flex-direction: column;
+        overflow-y: auto; /* Move scrolling to the main container */
+        padding: 15px;
+        gap: 15px;
+    }
+
+    /* 3. Adjust panel sizing */
+    .dash-left, .dash-right {
+        flex: none; /* Stop them from trying to split the screen 50/50 */
+        height: auto;
+    }
+
+    /* 4. Fix podium squishing */
+    .dash-podium-display {
+        min-height: 220px; /* Give the podium enough vertical room */
+        gap: 5px; /* Reduce gap to fit mobile width */
+        padding-bottom: 10px;
+    }
+
+    /* 5. Scale down avatars and text slightly for mobile */
+    .dash-avatar {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .dash-podium-item.rank-1 {
+        transform: scale(1.1); /* Slightly smaller pop-out for 1st place */
+    }
+
+    .dash-name {
+        font-size: 0.85rem;
+    }
+
+    .dash-xp-pill {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    /* 6. Allow the list to expand naturally inside the scrolling parent */
+    .dash-list-container {
+        overflow-y: visible; 
+    }
+}
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .brand-logo {
+                height: 100px;
+                margin: -25px 0 -25px -10px;
+            }
+            .dashboard-content { flex-direction: column; gap: 30px; padding-bottom: 50px; overflow-y: auto; }
+            .menu-card { width: 100%; height: auto; padding: 40px 20px; }
+            header { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div style="display: none;" id="parcel-hidden-assets">
+        <img id="asset_avatar_1" src="./web_assets/avatars/avatar_01_icon.png">
+        <img id="asset_avatar_2" src="./web_assets/avatars/avatar_02_icon.png">
+        <img id="asset_avatar_3" src="./web_assets/avatars/avatar_03_icon.png">
+        <img id="asset_avatar_4" src="./web_assets/avatars/avatar_04_icon.png">
+        <img id="asset_avatar_5" src="./web_assets/avatars/avatar_05_icon.png">
+        <img id="asset_avatar_6" src="./web_assets/avatars/avatar_06_icon.png">
+        <img id="asset_avatar_7" src="./web_assets/avatars/avatar_07_icon.png">
+        <img id="asset_avatar_8" src="./web_assets/avatars/avatar_08_icon.png">
+        <img id="asset_avatar_9" src="./web_assets/avatars/avatar_09_icon.png">
+        <img id="asset_avatar_11" src="./web_assets/avatars/avatar_11_icon.png">
+        <img id="asset_avatar_12" src="./web_assets/avatars/avatar_12_icon.png">
+        <img id="asset_avatar_13" src="./web_assets/avatars/avatar_13_icon.png">
+
+        <img id="asset_badge_all" src="./web_assets/badge_unit_all.png">
+        <img id="asset_badge_15" src="./web_assets/badge_unit_15.png">
+        <img id="asset_badge_6_4" src="./web_assets/badge_unit_6_4.png">
+        <img id="asset_badge_6_3" src="./web_assets/badge_unit_6_3.png">
+        <img id="asset_badge_6_2" src="./web_assets/badge_unit_6_2.png">
+        <img id="asset_badge_6_1" src="./web_assets/badge_unit_6_1.png">
+        <img id="asset_badge_4_5" src="./web_assets/badge_unit_4_5.png">
+    </div>
+
+    <div class="main-container">
+        <header>
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <img src="./web_assets/Logo.png" alt="Helix Hunter" class="brand-logo">
+            </div>
+            
+            <div class="header-user-section">
+                <div class="user-greeting" onclick="openDashboardModal()" title="View Leaderboard">
+                    <span id="greeting-text">Hi, Student</span> 
+                </div>
+                
+                <div class="user-avatar-btn" onclick="openAvatarModal()" title="Change Avatar">
+                    <img id="header-avatar-img" src="./web_assets/avatars/avatar_01_icon.png" alt="Avatar">
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="menu-card">
+                <div class="icon-area">
+                    <div class="icon-placeholder">🔬</div> 
+                </div>
+                <div>
+                    <h2>Class</h2>
+                    <p class="description">Learn • Watch • Practice</p>
+                </div>
+                <button class="action-btn" onclick="window.location.href='Class_page.html'">Continue Learning</button>
+            </div>
+
+            <div class="menu-card">
+                <div class="icon-area">
+                     <div class="icon-placeholder">🎮</div>
+                </div>
+                <div>
+                    <h2>Games</h2>
+                    <p class="description">Play • Quiz • Compete</p>
+                </div>
+                <button class="action-btn" onclick="window.location.href='game_chose_page.html'">Play Now</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #avatar-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        #avatar-modal-overlay.show { opacity: 1; visibility: visible; }
+        
+        .avatar-modal-box {
+            width: 90%; max-width: 800px; height: 75vh;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 250, 245, 0.98) 100%);
+            border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; position: relative;
+            transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; border: 1px solid rgba(255, 255, 255, 1);
+        }
+        #avatar-modal-overlay.show .avatar-modal-box { transform: translateY(0) scale(1); }
+
+        .avatar-header {
+            padding: 25px; text-align: center; border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+        .avatar-header h2 { font-size: 28px; margin: 0; }
+
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 20px; padding: 30px; overflow-y: auto; flex: 1;
+        }
+        .avatar-grid::-webkit-scrollbar { width: 8px; }
+        .avatar-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        .avatar-card {
+            background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px 10px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            cursor: pointer; border: 3px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .avatar-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .avatar-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .avatar-card .avatar-name { font-size: 13px; font-weight: 700; color: #444; }
+        
+        .avatar-card.selected {
+            border-color: #f39c12; background: #fdf2e9; transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.2);
+        }
+    </style>
+
+    <div id="avatar-modal-overlay">
+        <div class="avatar-modal-box">
+            <button class="dash-close-btn" onclick="closeAvatarModal()">×</button>
+            <div class="avatar-header">
+                <h2>Choose Your Avatar</h2>
+            </div>
+            <div class="avatar-grid" id="avatar-grid-container"></div>
+            <div class="avatar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <span class="logout-icon">🚪</span> Sign Out
+            </button>
+            
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .avatar-footer {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.5);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logout-btn {
+        background: #fff;
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .logout-btn:hover {
+        background: #e74c3c;
+        color: #fff;
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .logout-icon {
+        font-size: 18px;
+    }
+        #dash-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        #dash-modal-overlay.show { opacity: 1; visibility: visible; }
+        .dash-modal-box {
+            width: 90%; max-width: 1000px; height: 85vh;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 250, 245, 0.95) 100%);
+            backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 1); border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25), inset 0 0 20px rgba(255,255,255,0.5);
+            display: flex; flex-direction: column; position: relative;
+            transform: translateY(30px) scale(0.98); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        #dash-modal-overlay.show .dash-modal-box { transform: translateY(0) scale(1); }
+        .dash-close-btn {
+            position: absolute; top: 20px; right: 25px;
+            background: rgba(0,0,0,0.05); border: none; font-size: 28px; color: #333;
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s ease; z-index: 100;
+        }
+        .dash-close-btn:hover { background: #e74c3c; color: white; transform: rotate(90deg); }
+        .dash-header { padding: 25px 30px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center;}
+        .dash-header h2 { margin: 0; color: #1a4321; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;}
+        .dash-content { display: flex; flex: 1; overflow: hidden; padding: 25px; gap: 25px; }
+        .dash-left, .dash-right { flex: 1; background: rgba(255,255,255,0.6); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);}
+        .dash-right { flex: 1.2; overflow: hidden; }
+        .dash-podium-display { display: flex; justify-content: center; align-items: flex-end; height: 100%; gap: 15px; padding-bottom: 20px;}
+        .dash-podium-item { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; animation: popUp 0.5s ease backwards; }
+        .dash-podium-item.rank-1 { transform: scale(1.15); margin-bottom: 20px; z-index: 2; animation-delay: 0.2s;}
+        .dash-podium-item.rank-2 { animation-delay: 0.3s; }
+        .dash-podium-item.rank-3 { animation-delay: 0.4s; }
+        @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .dash-avatar-ring { border-radius: 50%; padding: 6px; margin-bottom: 10px; box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .dash-podium-item.rank-1 .dash-avatar-ring { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .dash-podium-item.rank-2 .dash-avatar-ring { background: linear-gradient(135deg, #bdc3c7, #95a5a6); }
+        .dash-podium-item.rank-3 .dash-avatar-ring { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .dash-avatar { width: 70px; height: 70px; border-radius: 50%; background: #eee; border: 4px solid white; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; overflow: hidden; }
+        .dash-avatar img, .dash-row-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transform: scale(0.9); }
+        .dash-name { font-weight: 700; font-size: 0.95rem; color: #2c3e50; margin-bottom: 5px; }
+        .dash-xp-pill { color: white; padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dash-podium-item.rank-1 .dash-xp-pill { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .dash-podium-item.rank-2 .dash-xp-pill { background: linear-gradient(135deg, #bdc3c7, #95a5a6); }
+        .dash-podium-item.rank-3 .dash-xp-pill { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .dash-list-header { font-weight: 800; font-size: 1.2rem; color: #2c3e50; margin-bottom: 15px; text-align: center; }
+        .dash-list-container { flex: 1; overflow-y: auto; padding-right: 10px; }
+        .dash-list-container::-webkit-scrollbar { width: 6px; }
+        .dash-list-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
+        .dash-row { display: grid; grid-template-columns: 40px 50px 1fr auto; align-items: center; background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; transition: 0.2s; border: 1px solid rgba(0,0,0,0.03); }
+        .dash-row:hover:not(.current-user) { transform: translateY(-2px); background: white; box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+        .dash-row-rank { font-weight: 800; color: #7f8c8d; }
+        .dash-row-avatar { width: 35px; height: 35px; border-radius: 50%; background: #eee; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;}
+        .dash-row-name { font-weight: 600; color: #2c3e50; padding-left: 10px; }
+        .dash-row-xp { font-weight: 700; color: #f39c12; }
+        .dash-user-anchor { margin-top: 10px; border-top: 2px solid rgba(0,0,0,0.05); padding-top: 10px; position: sticky; bottom: 0; background: transparent; }
+        .dash-row.current-user { background: #fdf2e9; border: 2px solid #f39c12; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.15); }
+        .dash-loading-wrapper { display: none; flex-direction: column; width: 100%; height: 100%; justify-content: center; align-items: center; }
+        .dash-spinner {
+            width: 50px; height: 50px; border: 5px solid rgba(243, 156, 18, 0.3);
+            border-top: 5px solid #f39c12; border-radius: 50%;
+            animation: dash-spin 1s linear infinite; margin-bottom: 15px;
+        }
+        .dash-loading-text { font-weight: 700; color: #f39c12; font-size: 18px; letter-spacing: 1px;}
+        @keyframes dash-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .dash-empty-message { text-align: center; color: #888; font-style: italic; padding: 20px; font-weight: 500;}
+    </style>
+
+    <div id="dash-modal-overlay">
+        <div class="dash-modal-box">
+            <button class="dash-close-btn" onclick="closeDashboardModal()">×</button>
+            <div class="dash-header"><h2>Live Leaderboard</h2></div>
+            <div id="dash-loading" class="dash-loading-wrapper">
+                <div class="dash-spinner"></div>
+                <div class="dash-loading-text">Syncing with Lab...</div>
+            </div>
+            <div class="dash-content" id="dash-content" style="display: none;">
+                <div class="dash-left">
+                    <div class="dash-podium-display" id="dash-podium-display"></div>
+                </div>
+                <div class="dash-right">
+                    <div class="dash-list-header">Full Standings</div>
+                    <div class="dash-list-container" id="dash-leaderboard-list"></div>
+                    <div class="dash-user-anchor" id="dash-user-anchor-row"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- 1. LOGIN & GREETING LOGIC ---
+        const studentName = localStorage.getItem('studentName');
+        if (!studentName) {
+            window.location.href = 'log_in.html';
+        } else {
+            document.getElementById('greeting-text').innerText = "Hi, " + studentName;
+        }
+
+        // --- 2. AVATAR SYSTEM LOGIC ---
+        let allAvatars = [
+            { "id": 1, "name": "Urban Ranger", "iconFile": "avatar_01_icon.png" },
+            { "id": 2, "name": "Red Cap", "iconFile": "avatar_02_icon.png" },
+            { "id": 3, "name": "Green Turban", "iconFile": "avatar_03_icon.png" },
+            { "id": 4, "name": "Centurion", "iconFile": "avatar_04_icon.png" },
+            { "id": 5, "name": "Knight", "iconFile": "avatar_05_icon.png" },
+            { "id": 6, "name": "Black Cap", "iconFile": "avatar_06_icon.png" },
+            { "id": 7, "name": "Pink Hair", "iconFile": "avatar_07_icon.png" },
+            { "id": 8, "name": "Purple Hijab", "iconFile": "avatar_08_icon.png" },
+            { "id": 9, "name": "Blonde Hair", "iconFile": "avatar_09_icon.png" },
+            { "id": 11, "name": "Bun Hair", "iconFile": "avatar_11_icon.png" },
+            { "id": 12, "name": "Cat Ear Hijab", "iconFile": "avatar_12_icon.png" },
+            { "id": 13, "name": "Samurai", "iconFile": "avatar_13_icon.png" }
+        ];
+
+        updateHeaderAvatarDisplay();
+
+        // Update the picture in the top right corner
+        function updateHeaderAvatarDisplay() {
+            const savedAvatarId = localStorage.getItem('studentAvatarId') || 1; 
+            const imgElement = document.getElementById('asset_avatar_' + savedAvatarId);
+            
+            if (imgElement) {
+                document.getElementById('header-avatar-img').src = imgElement.src;
+            }
+        }
+
+        // Open Menu and Generate Grid
+        function openAvatarModal() {
+            document.getElementById('avatar-modal-overlay').classList.add('show');
+            const gridContainer = document.getElementById('avatar-grid-container');
+            const savedAvatarId = localStorage.getItem('studentAvatarId') || 1;
+            
+            
+            gridContainer.innerHTML = ''; 
+
+            allAvatars.forEach(avatar => {
+                const isSelected = (avatar.id == savedAvatarId) ? 'selected' : '';
+                
+                const card = document.createElement('div');
+                card.className = `avatar-card ${isSelected}`;
+                card.onclick = () => selectAvatar(avatar.id);
+                
+                // Pull the processed src from the hidden sandbox!
+                const imgElement = document.getElementById('asset_avatar_' + avatar.id);
+                const actualSrc = imgElement ? imgElement.src : '';
+
+                card.innerHTML = `
+                    <img src="${actualSrc}" alt="${avatar.name}">
+                    <div class="avatar-name">${avatar.name}</div>
+                `;
+                
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal-overlay').classList.remove('show');
+        }
+
+                // Save selection, update UI, AND push to Google Sheets database
+        function selectAvatar(id) {
+            // 1. Instantly update the UI so it feels fast for the student
+            localStorage.setItem('studentAvatarId', id);
+            updateHeaderAvatarDisplay(); 
+            closeAvatarModal(); 
+            
+            // 2. Grab the student's email (you save this during login!)
+            const studentEmail = localStorage.getItem('userEmail'); 
+            
+            if (!studentEmail) {
+                console.error("No email found. Cannot save avatar to database.");
+                return;
+            }
+
+            // 3. Prepare the data package for the backend
+            const payload = {
+                action: 'update_avatar',
+                email: studentEmail,
+                token: localStorage.getItem('sessionToken'),
+                newAvatarId: id
+            };
+
+            // 4. Send the request to your Apps Script
+            fetch(dashScriptURL, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    console.log("Avatar successfully saved to database!");
+                } else {
+                    console.error("Backend error:", data.message);
+                }
+            })
+            .catch(err => console.error("Network error:", err));
+        }
+
+        // --- 3. LEADERBOARD LOGIC ---
+        const dashScriptURL = 'https://script.google.com/macros/s/AKfycbxryOSSf3t4oUMhNW-UJKS5lq69kJ6LDD5fjJe-cZ8eqis0Tf2o3gehON0AzAuqlcNlcw/exec';
+        
+        let preloadedLeaderboardData = null;
+
+        function preloadLeaderboard() {
+            fetch(dashScriptURL, { method: 'POST', body: JSON.stringify({ action: 'get_leaderboard' }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    preloadedLeaderboardData = data.data; 
+                    console.log("Leaderboard preloaded successfully!");
+                }
+            })
+            .catch(err => console.log("Background sync failed:", err));
+        }
+
+        preloadLeaderboard(); 
+
+        function processAndRenderLeaderboard(rawData) {
+            const studentName = localStorage.getItem('studentName') || 'Guest';
+
+            let realClassData = rawData.map((student) => {
+                let idToUse = student.avatarId || 1; 
+                if (student.name.toLowerCase() === studentName.toLowerCase()) {
+                    idToUse = localStorage.getItem('studentAvatarId') || 1;
+                }
+
+                // --- NAME SHORTENING LOGIC ---
+                let displayName = student.name.trim();
+                const nameParts = displayName.split(/\s+/);
+
+               if (nameParts.length === 2) {
+                    // 1. If exactly 2 words (e.g., "John Smith"), just use the First
+                    displayName = nameParts[0]; 
+                } else if (nameParts.length > 2) {
+                    // 2. If 3 or more words (e.g., "Md Khalid Khan"), grab the first two
+                    displayName = nameParts[0] + " " + nameParts[1]; 
+                }
+
+                                let highestBadgeUrl = '';
+                let badgeElementId = '';
+
+                if (student.completed) {
+                    // Identify which badge ID to look for in the HTML
+                    if (student.completed.includes('All')) badgeElementId = 'asset_badge_all';
+                    else if (student.completed.includes('Unit 15.1_15.2')) badgeElementId = 'asset_badge_15';
+                    else if (student.completed.includes('Unit 6.4')) badgeElementId = 'asset_badge_6_4';
+                    else if (student.completed.includes('Unit 6.3')) badgeElementId = 'asset_badge_6_3';
+                    else if (student.completed.includes('Unit 6.2')) badgeElementId = 'asset_badge_6_2';
+                    else if (student.completed.includes('Unit 6.1')) badgeElementId = 'asset_badge_6_1';
+                    else if (student.completed.includes('Unit 4.5')) badgeElementId = 'asset_badge_4_5';
+                }
+
+                // Reach into the "hidden assets" div and grab the Parcel-processed URL
+                if (badgeElementId) {
+                    const badgeImgElem = document.getElementById(badgeElementId);
+                    if (badgeImgElem) highestBadgeUrl = badgeImgElem.src;
+                }
+
+                return { 
+                    name: displayName, 
+                    xp: student.xp, 
+                    avatarHtml: getAvatarImgTag(idToUse),
+                    badgeImg: highestBadgeUrl // Now using the real bundled URL!
+                };
+                // --- END PASTE ---
+            });
+
+            const sortedData = realClassData.sort((a, b) => b.xp - a.xp);
+            renderDashPodium(sortedData);
+            renderDashList(sortedData);
+            anchorDashUserRank(sortedData, studentName);
+        }
+
+        function getAvatarImgTag(avatarId) {
+            const imgElement = document.getElementById('asset_avatar_' + avatarId) || document.getElementById('asset_avatar_1');
+            const actualSrc = imgElement ? imgElement.src : '';
+            return `<img src="${actualSrc}" alt="Avatar">`;
+        }
+
+        function openDashboardModal() {
+            document.getElementById('dash-modal-overlay').classList.add('show');
+            
+            if (preloadedLeaderboardData) {
+                document.getElementById('dash-loading').style.display = 'none';
+                document.getElementById('dash-content').style.display = 'flex';
+                processAndRenderLeaderboard(preloadedLeaderboardData);
+                preloadLeaderboard(); 
+            } else {
+                document.getElementById('dash-loading').style.display = 'flex';
+                document.getElementById('dash-content').style.display = 'none';
+                fetchLeaderboardData(); 
+            }
+        }
+
+        function closeDashboardModal() {
+            document.getElementById('dash-modal-overlay').classList.remove('show');
+        }
+
+        function fetchLeaderboardData() {
+            fetch(dashScriptURL, { method: 'POST', body: JSON.stringify({ action: 'get_leaderboard' }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    document.getElementById('dash-loading').style.display = 'none';
+                    document.getElementById('dash-content').style.display = 'flex';
+                    processAndRenderLeaderboard(data.data);
+                    preloadedLeaderboardData = data.data; 
+                }
+            })
+            .catch(err => {
+                document.getElementById('dash-loading').innerHTML = "<div class='dash-loading-text' style='color:red;'>Network Error. Try again.</div>";
+            });
+        }
+
+       // --- UPDATE PODIUM FUNCTION ---
+        function renderDashPodium(sortedData) {
+            const podium = document.getElementById('dash-podium-display');
+            podium.innerHTML = ''; 
+            if (sortedData.length === 0) { podium.innerHTML = '<div class="dash-empty-message">No students have played yet! Be the first!</div>'; return; }
+            
+            const visualOrder = [];
+            if (sortedData.length > 1) visualOrder.push({ data: sortedData[1], rank: 2, visualClass: 'rank-2' }); 
+            if (sortedData.length > 0) visualOrder.push({ data: sortedData[0], rank: 1, visualClass: 'rank-1' }); 
+            if (sortedData.length > 2) visualOrder.push({ data: sortedData[2], rank: 3, visualClass: 'rank-3' }); 
+            
+            visualOrder.forEach(student => {
+                // Assume student.data.badgeImg holds the URL to their highest badge (e.g., './web_assets/badge_unit_4_5.png')
+                // If they have no badges, you can pass a transparent placeholder or an empty string.
+                let badgeHtml = student.data.badgeImg ? `<div class="podium-badge"><img src="${student.data.badgeImg}" alt="Badge"></div>` : '';
+
+                podium.innerHTML += `
+                    <div class="dash-podium-item ${student.visualClass}">
+                        <div class="dash-avatar-ring">
+                            ${badgeHtml} <div class="dash-avatar">${student.data.avatarHtml}</div>
+                        </div>
+                        <div class="dash-name">${student.data.name}</div>
+                        <div class="dash-xp-pill">${student.data.xp.toLocaleString()} XP</div>
+                    </div>`;
+            });
+        }
+
+        // --- UPDATE LIST FUNCTION ---
+        function renderDashList(classData) {
+            const list = document.getElementById('dash-leaderboard-list');
+            list.innerHTML = ''; 
+            if (classData.length <= 3) { list.innerHTML = '<div class="dash-empty-message">More students will appear here as they join!</div>'; return; }
+            
+            for (let i = 3; i < classData.length; i++) {
+                let badgeHtml = classData[i].badgeImg ? `<img src="${classData[i].badgeImg}" class="row-badge" title="Highest Badge">` : '';
+
+                list.innerHTML += `
+                    <div class="dash-row">
+                        <div class="dash-row-rank">#${i + 1}</div>
+                        <div class="dash-row-avatar">${classData[i].avatarHtml}</div>
+                        <div class="dash-row-name">
+                            ${classData[i].name} 
+                            ${badgeHtml} </div>
+                        <div class="dash-row-xp">${classData[i].xp.toLocaleString()} XP</div>
+                    </div>`;
+            }
+        }
+
+
+        function anchorDashUserRank(classData, currentName) {
+            const anchor = document.getElementById('dash-user-anchor-row');
+            const userIndex = classData.findIndex(s => s.name.toLowerCase() === currentName.toLowerCase());
+            if (userIndex !== -1) {
+                const userData = classData[userIndex];
+                const borderStyle = classData.length > 3 ? "border-top: 2px solid rgba(0,0,0,0.05);" : "border-top: none;";
+                anchor.style = borderStyle;
+                anchor.innerHTML = `
+                    <div class="dash-row current-user">
+                        <div class="dash-row-rank">#${userIndex + 1}</div>
+                        <div class="dash-row-avatar">${userData.avatarHtml}</div>
+                        <div class="dash-row-name">You (${userData.name})</div>
+                        <div class="dash-row-xp">${userData.xp.toLocaleString()} XP</div>
+                    </div>`;
+            } else {
+                anchor.innerHTML = `<div style="text-align:center; padding: 10px; font-weight: bold; color: #f39c12;">Play a game to join the leaderboard!</div>`;
+            }
+        }
+
+                function logout() {
+            // Completely wipe all local session data to prevent state leakage
+            localStorage.clear();
+            
+            // Redirect back to the login page
+            window.location.href = 'log_in.html';
+        }
+        
+    </script>
+</body>
+</html>

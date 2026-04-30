@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - Biology Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- GLOBAL RESET (MATCHING YOUR STYLE) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: url('web_assets/background_imagee.png') no-repeat center center/cover;
+            min-height: 100vh;
+            background-color: #e8f5e9;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            width: 100%; 
+            min-height: 100vh;
+            background-color: rgba(26, 67, 33, 0.05); 
+            display: flex; flex-direction: column;
+            padding: 20px 50px;
+        }
+
+                .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            /* 1. Force it to be huge to combat the empty transparent space */
+            height: 140px; 
+            width: auto;
+            /* 2. Negative margins pull it tight so it doesn't stretch your header */
+            margin: -40px 0 -40px -15px; 
+            
+            opacity: 0;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.05));
+            
+            /* 3. Slower, much more obvious entrance animation */
+            animation: logoFadeIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* 4. A much stronger hover effect so you can clearly see it */
+        .logo-container:hover .brand-logo {
+            transform: scale(1.12) translateY(-5px) rotate(-2deg);
+            filter: drop-shadow(0 12px 20px rgba(26, 67, 33, 0.3));
+        }
+
+        /* 5. A wider, bouncier entrance keyframe */
+        @keyframes logoFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+
+        /* --- NAVIGATION --- */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 30px; }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { text-decoration: none; color: #1a4321; font-weight: 600; font-size: 18px; position: relative; }
+        .nav-links a.active::after { content: ''; position: absolute; width: 100%; height: 3px; background: #e67e22; bottom: -5px; left: 0; border-radius: 2px; }
+        
+        /* --- PROFILE BUTTON & AVATAR --- */
+        .header-user-section { display: flex; align-items: center; gap: 15px; }
+
+        .user-greeting {
+            font-size: 20px; font-weight: 600; color: #1a4321;
+            background: rgba(255, 255, 255, 0.6); padding: 10px 25px;
+            border-radius: 50px; backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px;
+            cursor: pointer; transition: background 0.3s ease;
+        }
+        
+        #greeting-text { position: relative; display: inline-block; }
+        #greeting-text::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: -2px; left: 0;
+            background-color: #1a4321; transition: width 0.3s ease-in-out;
+        }
+        .user-greeting:hover #greeting-text::after { width: 100%; }
+
+        .user-avatar-btn {
+            width: 60px; height: 60px; border-radius: 50%; background: #ffffff;
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(135deg, #2ecc71, #1a4321);
+            background-origin: border-box; background-clip: content-box, border-box;
+            box-shadow: 0 8px 20px rgba(26, 67, 33, 0.15); display: flex;
+            justify-content: center; align-items: center; overflow: visible; 
+            position: relative; transition: all 0.3s ease; cursor: pointer;
+        }
+        .user-avatar-btn:hover { transform: scale(1.1) rotate(5deg); }
+        .user-avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transform: scale(0.9); }
+
+        /* --- MAIN CONTENT AREA --- */
+        .game-content-wrapper {
+            flex: 1; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 40px 50px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-size: 42px; color: #1a4321; margin-bottom: 50px; font-weight: 800; text-align: center; }
+
+        /* --- GRID SYSTEM FOR CARDS --- */
+        .games-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; width: 100%; }
+
+        /* --- GAME CARD DESIGN --- */
+        .game-card {
+            position: relative; background: linear-gradient(180deg, rgba(200, 240, 230, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 30px; padding: 30px 20px;
+            text-align: center; display: flex; flex-direction: column; align-items: center;
+            justify-content: space-between; min-height: 400px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: linear-gradient(180deg, rgba(200, 240, 230, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+        }
+
+        .unit-label { font-size: 14px; font-weight: 700; color: #1a4321; opacity: 0.7; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .game-icon { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); animation: float 3s ease-in-out infinite; }
+        .game-card:nth-child(2) .game-icon { animation-delay: 0.5s; }
+        .game-card:nth-child(3) .game-icon { animation-delay: 1s; }
+        .game-card:nth-child(4) .game-icon { animation-delay: 1.5s; }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
+        .game-title { font-size: 24px; font-weight: 800; color: #1a4321; margin-bottom: 10px; }
+        .game-desc { font-size: 15px; color: #555; line-height: 1.5; margin-bottom: 30px; flex-grow: 1; }
+
+        /* --- BUTTONS --- */
+        .play-btn {
+            width: 100%; padding: 15px 0; border-radius: 50px; border: none; font-size: 16px;
+            font-weight: 700; color: white; cursor: pointer; background: linear-gradient(90deg, #e67e22 0%, #f39c12 100%);
+            box-shadow: 0 10px 20px rgba(230, 126, 34, 0.3); position: relative; overflow: hidden; transition: transform 0.2s;
+        }
+        .play-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.6s;
+        }
+        .play-btn:hover::before { left: 100%; }
+        .play-btn:hover { transform: scale(1.05); }
+        .play-btn:active { transform: scale(0.95); }
+
+        /* --- COMPLETED BADGE --- */
+        .badge {
+            position: absolute; top: 15px; right: 15px; background: #27ae60; color: white;
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; display: none; 
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); z-index: 5;
+        }
+        .game-card.completed .badge { display: block; }
+        .game-card.completed { border: 2px solid #27ae60; }
+
+        /* --- LOCKED CARD STATE --- */
+        .game-card.locked {
+            opacity: 0.65;
+            filter: grayscale(85%);
+            pointer-events: none; /* Prevents clicking */
+            box-shadow: none;
+            background: linear-gradient(180deg, rgba(230, 230, 230, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+        }
+        
+        .game-card.locked .play-btn {
+            background: #bdc3c7; /* Flat gray color */
+            box-shadow: none;
+            color: #ffffff;
+            cursor: not-allowed;
+        }
+
+        .game-card.locked .play-btn::before {
+            display: none; /* Removes the shiny hover effect */
+        }
+        
+        .game-card.locked .game-icon {
+            animation: none; /* Stops the floating animation */
+            opacity: 0.5;
+        }
+
+        /* Tweak for Progress Bar Badges to prevent squishing */
+        .badge-node img {
+            object-fit: contain; /* Ensures the shield shape stays perfect */
+        }
+
+        /* ========================================================
+           MODAL CSS (AVATAR & DASHBOARD) IMPORTED FROM index.html 
+           ======================================================== */
+        #avatar-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        #avatar-modal-overlay.show { opacity: 1; visibility: visible; }
+        
+        .avatar-modal-box {
+            width: 90%; max-width: 800px; height: 75vh;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 250, 245, 0.98) 100%);
+            border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; position: relative;
+            transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; border: 1px solid rgba(255, 255, 255, 1);
+        }
+        #avatar-modal-overlay.show .avatar-modal-box { transform: translateY(0) scale(1); }
+
+        .avatar-header { padding: 25px; text-align: center; border-bottom: 2px solid rgba(0,0,0,0.05); }
+        .avatar-header h2 { font-size: 28px; margin: 0; }
+
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 20px; padding: 30px; overflow-y: auto; flex: 1;
+        }
+        .avatar-grid::-webkit-scrollbar { width: 8px; }
+        .avatar-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        .avatar-card {
+            background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px 10px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            cursor: pointer; border: 3px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .avatar-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .avatar-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .avatar-card .avatar-name { font-size: 13px; font-weight: 700; color: #444; }
+        
+        .avatar-card.selected {
+            border-color: #f39c12; background: #fdf2e9; transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.2);
+        }
+
+        .avatar-footer {
+            padding: 20px; background: rgba(255, 255, 255, 0.5); border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .logout-btn {
+            background: #fff; color: #e74c3c; border: 2px solid #e74c3c; padding: 10px 25px;
+            border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .logout-btn:hover { background: #e74c3c; color: #fff; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3); transform: translateY(-2px); }
+
+        /* Dashboard Modal */
+        #dash-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        #dash-modal-overlay.show { opacity: 1; visibility: visible; }
+        .dash-modal-box {
+            width: 90%; max-width: 1000px; height: 85vh;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 250, 245, 0.95) 100%);
+            backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 1); border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25), inset 0 0 20px rgba(255,255,255,0.5);
+            display: flex; flex-direction: column; position: relative;
+            transform: translateY(30px) scale(0.98); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        #dash-modal-overlay.show .dash-modal-box { transform: translateY(0) scale(1); }
+        .dash-close-btn {
+            position: absolute; top: 20px; right: 25px;
+            background: rgba(0,0,0,0.05); border: none; font-size: 28px; color: #333;
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s ease; z-index: 100;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #1a4321;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .progress-track-wrapper {
+            position: relative;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        .progress-track-bg {
+            position: absolute;
+            width: 100%;
+            height: 14px;
+            background-color: #d1d5db;
+            border-radius: 10px;
+            z-index: 1;
+        }
+        .progress-track-fill {
+            position: absolute;
+            height: 14px;
+            background-color: #4ade80;
+            border-radius: 10px;
+            z-index: 2;
+            transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+        }
+        .badge-nodes {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 3;
+            padding: 0; 
+        }
+        .badge-node img {
+            width: 50px;
+            height: 50px;
+            transition: all 0.5s ease;
+            border-radius: 50%;
+            background: #e8f5e9;
+            padding: 3px;
+        }
+        .badge-node.locked img {
+            filter: grayscale(100%) opacity(50%);
+            transform: scale(0.8);
+        }
+        .badge-node.unlocked img {
+            filter: drop-shadow(0 6px 10px rgba(74, 222, 128, 0.5));
+            transform: scale(1.15);
+        }
+        /* --- PODIUM BADGE CSS --- */
+        .dash-avatar-ring {
+            position: relative; /* This is required so the absolute badge stays attached to the ring */
+        }
+
+        .podium-badge {
+            position: absolute;
+            top: -10px;    
+            right: -10px;  
+            width: 32px;            
+            height: 32px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .podium-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- LIST BADGE CSS --- */
+        .dash-row-name {
+            display: flex;
+            align-items: center;
+            gap: 12px; 
+        }
+
+        .row-badge {
+            width: 32px;           /* Increased to match podium badges */
+            height: 32px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            object-fit: cover;   
+            padding: 0;            /* Removed padding so the graphic fills the circle */
+        }
+
+        .dash-close-btn:hover { background: #e74c3c; color: white; transform: rotate(90deg); }
+        .dash-header { padding: 25px 30px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center;}
+        .dash-header h2 { margin: 0; color: #1a4321; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;}
+        .dash-content { display: flex; flex: 1; overflow: hidden; padding: 25px; gap: 25px; }
+        .dash-left, .dash-right { flex: 1; background: rgba(255,255,255,0.6); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);}
+        .dash-right { flex: 1.2; overflow: hidden; }
+        .dash-podium-display { display: flex; justify-content: center; align-items: flex-end; height: 100%; gap: 15px; padding-bottom: 20px;}
+        .dash-podium-item { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; animation: popUp 0.5s ease backwards; }
+        .dash-podium-item.rank-1 { transform: scale(1.15); margin-bottom: 20px; z-index: 2; animation-delay: 0.2s;}
+        .dash-podium-item.rank-2 { animation-delay: 0.3s; }
+        .dash-podium-item.rank-3 { animation-delay: 0.4s; }
+        @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .dash-avatar-ring { border-radius: 50%; padding: 6px; margin-bottom: 10px; box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .dash-podium-item.rank-1 .dash-avatar-ring { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .dash-podium-item.rank-2 .dash-avatar-ring { background: linear-gradient(135deg, #bdc3c7, #95a5a6); }
+        .dash-podium-item.rank-3 .dash-avatar-ring { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .dash-avatar { width: 70px; height: 70px; border-radius: 50%; background: #eee; border: 4px solid white; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; overflow: hidden; }
+        .dash-avatar img, .dash-row-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transform: scale(0.9); }
+        .dash-name { font-weight: 700; font-size: 0.95rem; color: #2c3e50; margin-bottom: 5px; }
+        .dash-xp-pill { color: white; padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dash-podium-item.rank-1 .dash-xp-pill { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .dash-podium-item.rank-2 .dash-xp-pill { background: linear-gradient(135deg, #bdc3c7, #95a5a6); }
+        .dash-podium-item.rank-3 .dash-xp-pill { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .dash-list-header { font-weight: 800; font-size: 1.2rem; color: #2c3e50; margin-bottom: 15px; text-align: center; }
+        .dash-list-container { flex: 1; overflow-y: auto; padding-right: 10px; }
+        .dash-list-container::-webkit-scrollbar { width: 6px; }
+        .dash-list-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
+        .dash-row { display: grid; grid-template-columns: 40px 50px 1fr auto; align-items: center; background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; transition: 0.2s; border: 1px solid rgba(0,0,0,0.03); }
+        .dash-row:hover:not(.current-user) { transform: translateY(-2px); background: white; box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+        .dash-row-rank { font-weight: 800; color: #7f8c8d; }
+        .dash-row-avatar { width: 35px; height: 35px; border-radius: 50%; background: #eee; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;}
+        .dash-row-name { font-weight: 600; color: #2c3e50; padding-left: 10px; }
+        .dash-row-xp { font-weight: 700; color: #f39c12; }
+        .dash-user-anchor { margin-top: 10px; border-top: 2px solid rgba(0,0,0,0.05); padding-top: 10px; position: sticky; bottom: 0; background: transparent; }
+        .dash-row.current-user { background: #fdf2e9; border: 2px solid #f39c12; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.15); }
+        .dash-loading-wrapper { display: none; flex-direction: column; width: 100%; height: 100%; justify-content: center; align-items: center; }
+        .dash-spinner { width: 50px; height: 50px; border: 5px solid rgba(243, 156, 18, 0.3); border-top: 5px solid #f39c12; border-radius: 50%; animation: dash-spin 1s linear infinite; margin-bottom: 15px; }
+        .dash-loading-text { font-weight: 700; color: #f39c12; font-size: 18px; letter-spacing: 1px;}
+        @keyframes dash-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .dash-empty-message { text-align: center; color: #888; font-style: italic; padding: 20px; font-weight: 500;}
+
+        /* --- RESPONSIVE --- */
+        /* --- LEADERBOARD MOBILE RESPONSIVE FIX --- */
+        @media (max-width: 900px) {
+            /* 1. Maximize modal space on mobile */
+            .dash-modal-box {
+                width: 95%;
+                height: 90vh;
+                transform: translateY(10px) scale(0.98); /* Slight adjustment for entrance animation */
+            }
+            
+            /* 2. Stack the podium and list vertically */
+            .dash-content {
+                flex-direction: column;
+                overflow-y: auto; /* Move scrolling to the main container */
+                padding: 15px;
+                gap: 15px;
+            }
+
+            /* 3. Adjust panel sizing */
+            .dash-left, .dash-right {
+                flex: none; /* Stop them from trying to split the screen 50/50 */
+                height: auto;
+            }
+
+            /* 4. Fix podium squishing */
+            .dash-podium-display {
+                min-height: 220px; /* Give the podium enough vertical room */
+                gap: 5px; /* Reduce gap to fit mobile width */
+                padding-bottom: 10px;
+            }
+
+            /* 5. Scale down avatars and text slightly for mobile */
+            .dash-avatar {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .dash-podium-item.rank-1 {
+                transform: scale(1.1); /* Slightly smaller pop-out for 1st place */
+            }
+
+            .dash-name {
+                font-size: 0.85rem;
+            }
+
+            .dash-xp-pill {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+
+            /* 6. Allow the list to expand naturally inside the scrolling parent */
+            .dash-list-container {
+                overflow-y: visible; 
+            }
+        }
+        @media (max-width: 1200px) { .games-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) {
+            .brand-logo {
+                height: 100px;
+                margin: -25px 0 -25px -10px;
+            }
+            .main-container { padding: 15px; }
+            nav { flex-direction: column; gap: 15px; }
+            .nav-links { gap: 20px; }
+            .game-content-wrapper { padding: 30px 20px; }
+            h1 { font-size: 30px; margin-bottom: 30px; }
+        }
+        @media (max-width: 600px) { .games-grid { grid-template-columns: 1fr; } }
+
+
+    </style>
+</head>
+<body>
+
+    <div style="display: none;" id="parcel-hidden-assets">
+        <img id="asset_avatar_1" src="./web_assets/avatars/avatar_01_icon.png">
+        <img id="asset_avatar_2" src="./web_assets/avatars/avatar_02_icon.png">
+        <img id="asset_avatar_3" src="./web_assets/avatars/avatar_03_icon.png">
+        <img id="asset_avatar_4" src="./web_assets/avatars/avatar_04_icon.png">
+        <img id="asset_avatar_5" src="./web_assets/avatars/avatar_05_icon.png">
+        <img id="asset_avatar_6" src="./web_assets/avatars/avatar_06_icon.png">
+        <img id="asset_avatar_7" src="./web_assets/avatars/avatar_07_icon.png">
+        <img id="asset_avatar_8" src="./web_assets/avatars/avatar_08_icon.png">
+        <img id="asset_avatar_9" src="./web_assets/avatars/avatar_09_icon.png">
+        <img id="asset_avatar_11" src="./web_assets/avatars/avatar_11_icon.png">
+        <img id="asset_avatar_12" src="./web_assets/avatars/avatar_12_icon.png">
+        <img id="asset_avatar_13" src="./web_assets/avatars/avatar_13_icon.png">
+
+        <img id="asset_badge_all" src="./web_assets/badge_unit_all.png">
+        <img id="asset_badge_15" src="./web_assets/badge_unit_15.png">
+        <img id="asset_badge_6_4" src="./web_assets/badge_unit_6_4.png">
+        <img id="asset_badge_6_3" src="./web_assets/badge_unit_6_3.png">
+        <img id="asset_badge_6_2" src="./web_assets/badge_unit_6_2.png">
+        <img id="asset_badge_6_1" src="./web_assets/badge_unit_6_1.png">
+        <img id="asset_badge_4_5" src="./web_assets/badge_unit_4_5.png">
+    </div>
+
+    <div class="main-container">
+        <nav>
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <img src="./web_assets/Logo.png" alt="Helix Hunter" class="brand-logo">
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="Class_page.html">Class</a>
+                <a href="#" class="active">Games</a>
+            </div>
+            
+            <div class="header-user-section">
+                <div class="user-greeting" onclick="openDashboardModal()" title="View Leaderboard">
+                    <span id="greeting-text">Hi, Student</span> 🏆
+                </div>
+                
+                <div class="user-avatar-btn" onclick="openAvatarModal()" title="Change Avatar">
+                    <img id="header-avatar-img" src="./web_assets/avatars/avatar_01_icon.png" alt="Avatar">
+                </div>
+            </div>
+        </nav>
+
+        <div class="game-content-wrapper">
+            <h1>Biology Games</h1>
+
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span>My Progress:</span>
+                    <span id="progress-text">Completed: 0 / 7</span>
+                </div>
+                
+                <div class="progress-track-wrapper">
+                    <div class="progress-track-bg"></div>
+                    <div class="progress-track-fill" id="progress-fill" style="width: 0%;"></div>
+                    
+                    <div class="badge-nodes">
+                        <div class="badge-node locked" data-unit="Unit 4.5">
+                            <img src="./web_assets/badge_unit_4_5.png" alt="Unit 4.5">
+                        </div>
+                        <div class="badge-node locked" data-unit="Unit 6.1">
+                            <img src="./web_assets/badge_unit_6_1.png" alt="Unit 6.1">
+                        </div>
+                        <div class="badge-node locked" data-unit="Unit 6.2">
+                            <img src="./web_assets/badge_unit_6_2.png" alt="Unit 6.2">
+                        </div>
+                        <div class="badge-node locked" data-unit="Unit 6.3">
+                            <img src="./web_assets/badge_unit_6_3.png" alt="Unit 6.3">
+                        </div>
+                        <div class="badge-node locked" data-unit="Unit 6.4">
+                            <img src="./web_assets/badge_unit_6_4.png" alt="Unit 6.4">
+                        </div>
+                        <div class="badge-node locked" data-unit="Unit 15.1_15.2">
+                            <img src="./web_assets/badge_unit_15.png" alt="Unit 15">
+                        </div>
+                        <div class="badge-node locked" data-unit="All">
+                            <img src="./web_assets/badge_unit_all.png" alt="All Units">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="games-grid">
+                <div class="game-card" id="card-Unit-4-5">
+                    <div class="unit-label">Unit 4.5</div>
+                    <div class="game-icon">🧬</div>
+                    <div class="game-title">Nucleic Acids</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">What is the basic monomer unit that builds up a DNA molecule?</div>
+                    <button class="play-btn" onclick="startGame('Unit 4.5')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-Unit-6-1">
+                    <div class="unit-label">Unit 6.1</div>
+                    <div class="game-icon">🧫</div>
+                    <div class="game-title">Fundamentals</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">Learn the core principles and fundamentals of cellular biology!</div>
+                    <button class="play-btn" onclick="startGame('Unit 6.1')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-Unit-6-2">
+                    <div class="unit-label">Unit 6.2</div>
+                    <div class="game-icon">✖️</div>
+                    <div class="game-title">Mitosis</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">Master the phases of somatic cell division and replication.</div>
+                    <button class="play-btn" onclick="startGame('Unit 6.2')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-Unit-6-3">
+                    <div class="unit-label">Unit 6.3</div>
+                    <div class="game-icon">¼</div>
+                    <div class="game-title">Meiosis</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">Dive into gamete formation and discover how genetic variation occurs!</div>
+                    <button class="play-btn" onclick="startGame('Unit 6.3')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-Unit-6-4">
+                    <div class="unit-label">Unit 6.4</div>
+                    <div class="game-icon">⚕️</div>
+                    <div class="game-title">Division Issues</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">What happens when cell division goes wrong? Identify the anomalies.</div>
+                    <button class="play-btn" onclick="startGame('Unit 6.4')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-Unit-15-1-2">
+                    <div class="unit-label">Unit 15.1 & 15.2</div>
+                    <div class="game-icon">♀️♂️</div>
+                    <div class="game-title">Reproductive System</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">Explore gametogenesis and the complex human reproductive system!</div>
+                    <button class="play-btn" onclick="startGame('Unit 15.1_15.2')">Play Now</button>
+                </div>
+
+                <div class="game-card" id="card-All">
+                    <div class="unit-label">Bonus: Review</div>
+                    <div class="game-icon">🧠</div>
+                    <div class="game-title">All Units</div>
+                    <span class="badge">✓ Completed</span>
+                    <div class="game-desc">Challenge yourself with the ultimate quiz covering every unit!</div>
+                    <button class="play-btn" onclick="startGame('All')">Play Now</button>
+                </div>
+            </div>  
+        </div>
+    </div>
+
+    <div id="avatar-modal-overlay">
+        <div class="avatar-modal-box">
+            <button class="dash-close-btn" onclick="closeAvatarModal()">×</button>
+            <div class="avatar-header"><h2>Choose Your Avatar</h2></div>
+            <div class="avatar-grid" id="avatar-grid-container"></div>
+            <div class="avatar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <span class="logout-icon">🚪</span> Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dash-modal-overlay">
+        <div class="dash-modal-box">
+            <button class="dash-close-btn" onclick="closeDashboardModal()">×</button>
+            <div class="dash-header"><h2>Live Leaderboard</h2></div>
+            <div id="dash-loading" class="dash-loading-wrapper">
+                <div class="dash-spinner"></div>
+                <div class="dash-loading-text">Syncing with Lab...</div>
+            </div>
+            <div class="dash-content" id="dash-content" style="display: none;">
+                <div class="dash-left">
+                    <div class="dash-podium-display" id="dash-podium-display"></div>
+                </div>
+                <div class="dash-right">
+                    <div class="dash-list-header">Full Standings</div>
+                    <div class="dash-list-container" id="dash-leaderboard-list"></div>
+                    <div class="dash-user-anchor" id="dash-user-anchor-row"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SESSION SECURITY & GREETING ---
+        const studentName = localStorage.getItem('studentName');
+        if (!studentName) {
+            window.location.href = 'log_in.html';
+        } else {
+            document.getElementById('greeting-text').innerText = "Hi, " + studentName;
+        }
+
+        // --- 2. AVATAR SYSTEM LOGIC ---
+        const dashScriptURL = 'https://script.google.com/macros/s/AKfycbxryOSSf3t4oUMhNW-UJKS5lq69kJ6LDD5fjJe-cZ8eqis0Tf2o3gehON0AzAuqlcNlcw/exec';
+        
+        let allAvatars = [
+            { "id": 1, "name": "Urban Ranger", "iconFile": "avatar_01_icon.png" },
+            { "id": 2, "name": "Red Cap", "iconFile": "avatar_02_icon.png" },
+            { "id": 3, "name": "Green Turban", "iconFile": "avatar_03_icon.png" },
+            { "id": 4, "name": "Centurion", "iconFile": "avatar_04_icon.png" },
+            { "id": 5, "name": "Knight", "iconFile": "avatar_05_icon.png" },
+            { "id": 6, "name": "Black Cap", "iconFile": "avatar_06_icon.png" },
+            { "id": 7, "name": "Pink Hair", "iconFile": "avatar_07_icon.png" },
+            { "id": 8, "name": "Purple Hijab", "iconFile": "avatar_08_icon.png" },
+            { "id": 9, "name": "Blonde Hair", "iconFile": "avatar_09_icon.png" },
+            { "id": 11, "name": "Bun Hair", "iconFile": "avatar_11_icon.png" },
+            { "id": 12, "name": "Cat Ear Hijab", "iconFile": "avatar_12_icon.png" },
+            { "id": 13, "name": "Samurai", "iconFile": "avatar_13_icon.png" }
+        ];
+
+        function updateHeaderAvatarDisplay() {
+            const savedAvatarId = localStorage.getItem('studentAvatarId') || 1; 
+            const imgElement = document.getElementById('asset_avatar_' + savedAvatarId);
+            if (imgElement && document.getElementById('header-avatar-img')) {
+                document.getElementById('header-avatar-img').src = imgElement.src;
+            }
+        }
+
+        function openAvatarModal() {
+            document.getElementById('avatar-modal-overlay').classList.add('show');
+            const gridContainer = document.getElementById('avatar-grid-container');
+            const savedAvatarId = localStorage.getItem('studentAvatarId') || 1;
+            gridContainer.innerHTML = ''; 
+
+            allAvatars.forEach(avatar => {
+                const isSelected = (avatar.id == savedAvatarId) ? 'selected' : '';
+                const card = document.createElement('div');
+                card.className = `avatar-card ${isSelected}`;
+                card.onclick = () => selectAvatar(avatar.id);
+                
+                const imgElement = document.getElementById('asset_avatar_' + avatar.id);
+                const actualSrc = imgElement ? imgElement.src : '';
+
+                card.innerHTML = `<img src="${actualSrc}" alt="${avatar.name}"><div class="avatar-name">${avatar.name}</div>`;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function closeAvatarModal() { document.getElementById('avatar-modal-overlay').classList.remove('show'); }
+
+        function selectAvatar(id) {
+            localStorage.setItem('studentAvatarId', id);
+            updateHeaderAvatarDisplay(); 
+            closeAvatarModal(); 
+            
+            const studentEmail = localStorage.getItem('userEmail'); 
+            if (!studentEmail) return;
+
+            fetch(dashScriptURL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'update_avatar', email: studentEmail, newAvatarId: id }) 
+            }).catch(err => console.error("Network error:", err));
+        }
+
+        function getAvatarImgTag(avatarId) {
+            const imgElement = document.getElementById('asset_avatar_' + avatarId) || document.getElementById('asset_avatar_1');
+            const actualSrc = imgElement ? imgElement.src : '';
+            return `<img src="${actualSrc}" alt="Avatar">`;
+        }
+
+        // --- 3. LEADERBOARD LOGIC ---
+        let preloadedLeaderboardData = null;
+
+        function preloadLeaderboard() {
+            fetch(dashScriptURL, { method: 'POST', body: JSON.stringify({ action: 'get_leaderboard' }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    preloadedLeaderboardData = data.data; 
+                    console.log("Leaderboard preloaded successfully!");
+                }
+            })
+            .catch(err => console.log("Background sync failed:", err));
+        }
+
+        preloadLeaderboard();
+
+        function processAndRenderLeaderboard(rawData) {
+            const studentName = localStorage.getItem('studentName') || 'Guest';
+
+            let realClassData = rawData.map((student) => {
+                let idToUse = student.avatarId || 1; 
+                if (student.name.toLowerCase() === studentName.toLowerCase()) {
+                    idToUse = localStorage.getItem('studentAvatarId') || 1;
+                }
+
+                // --- NAME SHORTENING LOGIC ---
+                let displayName = student.name.trim();
+                const nameParts = displayName.split(/\s+/);
+
+                if (nameParts.length === 2) {
+                    // 1. If exactly 2 words (e.g., "John Smith"), just use the First
+                    displayName = nameParts[0]; 
+                } else if (nameParts.length > 2) {
+                    // 2. If 3 or more words (e.g., "Md Khalid Khan"), grab the first two
+                    displayName = nameParts[0] + " " + nameParts[1]; 
+                }
+
+                // --- PASTE THIS NEW VERSION ---
+                let highestBadgeUrl = '';
+                let badgeElementId = '';
+
+                if (student.completed) {
+                    // Identify which badge ID to look for in the HTML
+                    if (student.completed.includes('All')) badgeElementId = 'asset_badge_all';
+                    else if (student.completed.includes('Unit 15.1_15.2')) badgeElementId = 'asset_badge_15';
+                    else if (student.completed.includes('Unit 6.4')) badgeElementId = 'asset_badge_6_4';
+                    else if (student.completed.includes('Unit 6.3')) badgeElementId = 'asset_badge_6_3';
+                    else if (student.completed.includes('Unit 6.2')) badgeElementId = 'asset_badge_6_2';
+                    else if (student.completed.includes('Unit 6.1')) badgeElementId = 'asset_badge_6_1';
+                    else if (student.completed.includes('Unit 4.5')) badgeElementId = 'asset_badge_4_5';
+                }
+
+                // Reach into the "hidden assets" div and grab the Parcel-processed URL
+                if (badgeElementId) {
+                    const badgeImgElem = document.getElementById(badgeElementId);
+                    if (badgeImgElem) highestBadgeUrl = badgeImgElem.src;
+                }
+
+                return { 
+                    name: displayName, 
+                    xp: student.xp, 
+                    avatarHtml: getAvatarImgTag(idToUse),
+                    badgeImg: highestBadgeUrl // Now using the real bundled URL!
+                };
+                // --- END PASTE ---
+            
+            });
+
+            const sortedData = realClassData.sort((a, b) => b.xp - a.xp);
+            renderDashPodium(sortedData);
+            renderDashList(sortedData);
+            anchorDashUserRank(sortedData, studentName);
+        }
+
+        function openDashboardModal() {
+            document.getElementById('dash-modal-overlay').classList.add('show');
+            
+            if (preloadedLeaderboardData) {
+                document.getElementById('dash-loading').style.display = 'none';
+                document.getElementById('dash-content').style.display = 'flex';
+                processAndRenderLeaderboard(preloadedLeaderboardData);
+                preloadLeaderboard(); 
+            } else {
+                document.getElementById('dash-loading').style.display = 'flex';
+                document.getElementById('dash-content').style.display = 'none';
+                fetchLeaderboardData(); 
+            }
+        }
+
+        function closeDashboardModal() { document.getElementById('dash-modal-overlay').classList.remove('show'); }
+
+        function fetchLeaderboardData() {
+            fetch(dashScriptURL, { method: 'POST', body: JSON.stringify({ action: 'get_leaderboard' }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    document.getElementById('dash-loading').style.display = 'none';
+                    document.getElementById('dash-content').style.display = 'flex';
+                    processAndRenderLeaderboard(data.data);
+                    preloadedLeaderboardData = data.data;
+                }
+            })
+            .catch(err => {
+                document.getElementById('dash-loading').innerHTML = "<div class='dash-loading-text' style='color:red;'>Network Error. Try again.</div>";
+            });
+        }
+
+        // --- UPDATE PODIUM FUNCTION ---
+        function renderDashPodium(sortedData) {
+            const podium = document.getElementById('dash-podium-display');
+            podium.innerHTML = ''; 
+            if (sortedData.length === 0) { podium.innerHTML = '<div class="dash-empty-message">No students have played yet! Be the first!</div>'; return; }
+            
+            const visualOrder = [];
+            if (sortedData.length > 1) visualOrder.push({ data: sortedData[1], rank: 2, visualClass: 'rank-2' }); 
+            if (sortedData.length > 0) visualOrder.push({ data: sortedData[0], rank: 1, visualClass: 'rank-1' }); 
+            if (sortedData.length > 2) visualOrder.push({ data: sortedData[2], rank: 3, visualClass: 'rank-3' }); 
+            
+            visualOrder.forEach(student => {
+                
+                // Assume student.data.badgeImg holds the URL to their highest badge (e.g., './web_assets/badge_unit_4_5.png')
+                // If they have no badges, you can pass a transparent placeholder or an empty string.
+                let badgeHtml = student.data.badgeImg ? `<div class="podium-badge"><img src="${student.data.badgeImg}" alt="Badge"></div>` : '';
+
+                podium.innerHTML += `
+                    <div class="dash-podium-item ${student.visualClass}">
+                        <div class="dash-avatar-ring">
+                            ${badgeHtml} <div class="dash-avatar">${student.data.avatarHtml}</div>
+                        </div>
+                        <div class="dash-name">${student.data.name}</div>
+                        <div class="dash-xp-pill">${student.data.xp.toLocaleString()} XP</div>
+                    </div>`;
+            });
+        }
+
+        // --- UPDATE LIST FUNCTION ---
+        function renderDashList(classData) {
+            const list = document.getElementById('dash-leaderboard-list');
+            list.innerHTML = ''; 
+            if (classData.length <= 3) { list.innerHTML = '<div class="dash-empty-message">More students will appear here as they join!</div>'; return; }
+            
+            for (let i = 3; i < classData.length; i++) {
+                let badgeHtml = classData[i].badgeImg ? `<img src="${classData[i].badgeImg}" class="row-badge" title="Highest Badge">` : '';
+
+
+                list.innerHTML += `
+                <div class="dash-row">
+                    <div class="dash-row-rank">#${i + 1}</div>
+                    <div class="dash-row-avatar">${classData[i].avatarHtml}</div>
+                    <div class="dash-row-name">
+                        <span>${classData[i].name}</span> 
+                        ${badgeHtml} 
+                    </div>
+                    <div class="dash-row-xp">${classData[i].xp.toLocaleString()} XP</div>
+                </div>`;
+            }
+        }
+
+
+
+
+
+
+
+
+        function anchorDashUserRank(classData, currentName) {
+            const anchor = document.getElementById('dash-user-anchor-row');
+            const userIndex = classData.findIndex(s => s.name.toLowerCase() === currentName.toLowerCase());
+            if (userIndex !== -1) {
+                const userData = classData[userIndex];
+                anchor.style = classData.length > 3 ? "border-top: 2px solid rgba(0,0,0,0.05);" : "border-top: none;";
+                anchor.innerHTML = `
+                    <div class="dash-row current-user">
+                        <div class="dash-row-rank">#${userIndex + 1}</div>
+                        <div class="dash-row-avatar">${userData.avatarHtml}</div>
+                        <div class="dash-row-name">You (${userData.name})</div>
+                        <div class="dash-row-xp">${userData.xp.toLocaleString()} XP</div>
+                    </div>`;
+            } else {
+                anchor.innerHTML = `<div style="text-align:center; padding: 10px; font-weight: bold; color: #f39c12;">Play a game to join the leaderboard!</div>`;
+            }
+        }
+
+        function logout() {
+                // Completely wipe all local session data to prevent state leakage
+                localStorage.clear();
+                
+                // Redirect back to the login page
+                window.location.href = 'log_in.html';
+            }
+        function updateProgressBar(completedChaptersArray) {
+            const badgeNodes = document.querySelectorAll('.badge-node');
+            const totalUnits = badgeNodes.length;
+            let completedCount = 0;
+
+            // Clean up the array (trim whitespace)
+            const cleanCompleted = completedChaptersArray.map(ch => ch.trim());
+
+            badgeNodes.forEach((node) => {
+                const unitName = node.getAttribute('data-unit');
+                
+                if (cleanCompleted.includes(unitName)) {
+                    node.classList.remove('locked');
+                    node.classList.add('unlocked');
+                    completedCount++;
+                } else {
+                    node.classList.add('locked');
+                    node.classList.remove('unlocked');
+                }
+            });
+
+            // Update text
+            document.getElementById('progress-text').innerText = `Completed: ${completedCount} / ${totalUnits}`;
+
+            // Animate bar
+            // If 0, it's 0%. If all, it's 100%. Otherwise calculate percentage and pull back slightly so it rests behind the highest badge.
+            let percentage = 0;
+            if (completedCount === totalUnits) {
+                percentage = 100;
+            } else if (completedCount > 0) {
+                percentage = ((completedCount / totalUnits) * 100) - 5; 
+            }
+            
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+        }
+
+        // HELPER: Updates the visual state of the game cards
+function applyCardStates(completedArray) {
+    // 1. Define the exact order of your games
+    const unitSequence = [
+        'Unit 4.5', 'Unit 6.1', 'Unit 6.2', 'Unit 6.3', 
+        'Unit 6.4', 'Unit 15.1_15.2', 'All'
+    ];
+
+    let isNextAvailable = true; // The first uncompleted game is the "Next Available"
+
+    // 2. Loop through the sequence and apply states
+    unitSequence.forEach((unitName) => {
+        // Match the HTML IDs
+        let cardId = 'card-' + unitName.replace(/\s+/g, '-').replace('.','-');
+        if(unitName === 'Unit 15.1_15.2') cardId = 'card-Unit-15-1-2';
+        if(unitName === 'All') cardId = 'card-All';
+
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        const btn = card.querySelector('.play-btn');
+        
+        // Reset classes just in case
+        card.classList.remove('completed', 'locked');
+
+        if (completedArray.includes(unitName)) {
+            // STATE 1: COMPLETED
+            card.classList.add('completed');
+            if (btn) btn.innerHTML = "Replay Mission ↺";
+        } 
+        else if (isNextAvailable) {
+            // STATE 2: UNLOCKED (Currently Active Level)
+            isNextAvailable = false; // Lock all subsequent levels
+            if (btn) btn.innerHTML = "Play Now ▶";
+        } 
+        else {
+            // STATE 3: LOCKED
+            card.classList.add('locked');
+            if (btn) btn.innerHTML = "🔒 Locked";
+        }
+    });
+}
+
+        // --- 4. PROGRESS TRACKING & GAME LAUNCH LOGIC ---
+        async function checkGameProgress() {
+        const userEmail = localStorage.getItem('userEmail');
+        
+        // --- PHASE 1: INSTANT LOCAL LOAD ---
+        // Grab whatever we have in local storage immediately
+        let completedArray = JSON.parse(localStorage.getItem('completedUnits')) || [];
+        
+        // Instantly update the UI so the user sees no delay
+        updateProgressBar(completedArray);
+        applyCardStates(completedArray);
+
+        // --- PHASE 2: BACKGROUND CLOUD SYNC ---
+        // Check the database quietly to ensure we are up to date
+        if (userEmail && userEmail !== 'guest') {
+            try {
+                const response = await fetch(dashScriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'get_progress', 
+                        email: userEmail, 
+                        token: localStorage.getItem('sessionToken') 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.result === 'success' && data.completedChapters) {
+                    // Get the fresh data from the cloud
+                    const cloudCompletedArray = data.completedChapters.split(',').map(ch => ch.trim());
+                    
+                    // Compare arrays (a simple check to see if cloud has more data than local)
+                    if (JSON.stringify(cloudCompletedArray) !== JSON.stringify(completedArray)) {
+                        // Update local storage with the new truth
+                        localStorage.setItem('completedUnits', JSON.stringify(cloudCompletedArray));
+                        
+                        // Re-paint the UI just in case the cloud had newer data
+                        updateProgressBar(cloudCompletedArray);
+                        applyCardStates(cloudCompletedArray);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch game progress from cloud, relying on local cache:", error);
+            }
+        }
+    }
+
+
+
+
+        function startGame(selectedChapter) {
+            localStorage.setItem('selectedChapter', selectedChapter);
+            window.location.href = './Game_index.html';
+        }
+
+        // Initialize Page
+        updateHeaderAvatarDisplay();
+        checkGameProgress();
+    </script>
+</body>
+</html>
