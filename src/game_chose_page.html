@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Security: Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://script.google.com; media-src 'self' data: blob:;">
     <title>Games - Biology Lab</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -686,7 +688,9 @@
     <script>
         // --- 1. SESSION SECURITY & GREETING ---
         const studentName = localStorage.getItem('studentName');
-        if (!studentName) {
+        const sessionToken = localStorage.getItem('sessionToken');
+        if (!studentName || !sessionToken) {
+            localStorage.clear();
             window.location.href = 'log_in.html';
         } else {
             document.getElementById('greeting-text').innerText = "Hi, " + studentName;
@@ -777,6 +781,12 @@
 
         preloadLeaderboard();
 
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
         function processAndRenderLeaderboard(rawData) {
             const studentName = localStorage.getItem('studentName') || 'Guest';
 
@@ -797,6 +807,8 @@
                     // 2. If 3 or more words (e.g., "Md Khalid Khan"), grab the first two
                     displayName = nameParts[0] + " " + nameParts[1]; 
                 }
+
+                displayName = escapeHTML(displayName);
 
                 // --- PASTE THIS NEW VERSION ---
                 let highestBadgeUrl = '';

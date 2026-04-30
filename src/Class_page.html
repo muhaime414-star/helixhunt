@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Security: Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://script.google.com; media-src 'self' data: blob:;">
     <title>Class - Biology Lab</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -764,8 +766,14 @@
        
         // --- AUTH & GREETING ---
         const studentName = localStorage.getItem('studentName');
-        if (!studentName) { window.location.href = 'log_in.html'; }
-        document.getElementById('greeting-text').innerText = "Hi, " + studentName;
+        const sessionToken = localStorage.getItem('sessionToken');
+        if (!studentName || !sessionToken) { 
+            localStorage.clear(); 
+            window.location.href = 'log_in.html'; 
+        } else {
+            const greetingElement = document.getElementById('greeting-text');
+            if (greetingElement) greetingElement.innerText = "Hi, " + studentName;
+        }
 
         // --- ATTACH ALL FUNCTIONS TO 'WINDOW' SO HTML BUTTONS CAN FIND THEM IN THE MODULE ---
         const dashScriptURL = 'https://script.google.com/macros/s/AKfycbxryOSSf3t4oUMhNW-UJKS5lq69kJ6LDD5fjJe-cZ8eqis0Tf2o3gehON0AzAuqlcNlcw/exec';
@@ -851,6 +859,15 @@
 
         window.preloadLeaderboard(); // Trigger on page load
 
+       
+
+        // --- SECURE HTML ESCAPE HELPER ---
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
         // --- 2. PROCESSING HELPER ---
         window.processAndRenderLeaderboard = function(rawData) {
             const studentName = localStorage.getItem('studentName') || 'Guest';
@@ -872,6 +889,7 @@
                     // 2. If 3 or more words (e.g., "Md Khalid Khan"), grab the first two
                     displayName = nameParts[0] + " " + nameParts[1]; 
                 }
+                displayName = escapeHTML(displayName);
 
                 // --- PASTE THIS NEW VERSION ---
                 let highestBadgeUrl = '';
