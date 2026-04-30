@@ -1110,6 +1110,7 @@
             if (data.video) {
                 videoContainer.innerHTML = `<video id="video-player" controls style="width: 100%; height: 100%; border-radius: 20px; object-fit: cover;"><source id="video-source" src="${data.video}" type="video/mp4"></video>`;
                 document.getElementById('video-player').load();
+                document.getElementById('video-player').volume = 0.4;
             } else {
                 videoContainer.innerHTML = window.getEmptyState('video');
             }
@@ -1122,6 +1123,13 @@
         };
 
         window.showTab = function(tabId) {
+            // 1. Grab the video player and pause it if it's playing
+            const video = document.getElementById('video-player');
+            if (video) {
+                video.pause();
+            }
+
+            // 2. Switch the active tabs (your original code)
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(`btn-${tabId}`).classList.add('active');
