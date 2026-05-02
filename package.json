@@ -17,8 +17,22 @@
     "parcel-reporter-static-files-copy": "^1.5.3",
     "process": "^0.11.10"
   },
-  "staticFiles": {
-    "staticPath": "src/scenes/Game_assets",
-    "staticOutDir": "scenes/Game_assets"
-  }
+  "staticFiles": [
+    {
+      "staticPath": "src/scenes/Game_assets",
+      "staticOutDir": "scenes/Game_assets"
+    },
+    {
+      "staticPath": "src/scenes/Game_assets",
+      "staticOutDir": "src/scenes/Game_assets"
+    },
+    {
+      "staticPath": "src/web_assets",
+      "staticOutDir": "web_assets"
+    },
+    {
+      "staticPath": "src/web_assets",
+      "staticOutDir": "src/web_assets"
+    }
+  ]
 }
