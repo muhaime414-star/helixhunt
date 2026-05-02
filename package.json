@@ -20,19 +20,23 @@
   "staticFiles": [
     {
       "staticPath": "src/scenes/Game_assets",
+      "staticOutDir": "src/scenes/Game_assets"
+    },
+    {
+      "staticPath": "src/scenes/Game_assets",
       "staticOutDir": "scenes/Game_assets"
     },
     {
       "staticPath": "src/scenes/Game_assets",
-      "staticOutDir": "src/scenes/Game_assets"
-    },
-    {
-      "staticPath": "src/web_assets",
-      "staticOutDir": "web_assets"
+      "staticOutDir": "Game_assets"
     },
     {
       "staticPath": "src/web_assets",
       "staticOutDir": "src/web_assets"
+    },
+    {
+      "staticPath": "src/web_assets",
+      "staticOutDir": "web_assets"
     }
   ]
 }
