@@ -2,5 +2,9 @@
   "extends": "@parcel/config-default",
   "transformers": {
     "*.{mp3,ogg,wav,m4a}": ["@parcel/transformer-raw"]
-  }
+  },
+  "reporters": [
+    "...",
+    "parcel-reporter-static-files-copy"
+  ]
 }
