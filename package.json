@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Cell Explorer Biology Game",
   "scripts": {
-  "start": "parcel \"src/*.html\"",
-  "build": "npx parcel build src/*.html", 
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+    "start": "parcel \"src/*.html\"",
+    "build": "chmod +x ./node_modules/.bin/parcel && parcel build src/*.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
